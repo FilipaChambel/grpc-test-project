@@ -5,9 +5,9 @@ import threading
 import time
 
 # In-memory storage
-users = {} # username -> password
+users = {"alice": "password123", "bob": "password456"} # username -> password
 active_users = {} #username -> (token, stream)
-messages = [] # List of chat messages
+message_queues = {} # List of chat messages
 
 class ChatService(chat_pb2_grpc.ChatServiceServicer):
     def Login(self, request, context):
@@ -16,7 +16,9 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
 
         if username in users and users[username] == password:
             token = f"token_{username}"
-            active_users[username] = (token, None)
+            active_users[username] = token
+            if username not in message_queues:
+                message_queues[username] = []
             return chat_pb2.LoginResponse(token=token, success=True, message="Login successful")
         else:
             return chat_pb2.LoginResponse(token="", success=False, message="Invalid credentails")
@@ -37,11 +39,7 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
         if receiver not in active_users:
             return chat_pb2.MessageResponse(success=False, message="User not online")
         
-        messages.append((sender, receiver, content))
-
-        #Stream the message if the receiver is listening
-        if active_users[receiver][1]:
-            active_users[receiver][1].write(chat_pb2.ChatMessage(sender=sender, content=content, timestamp=str(time.time())))
+        message_queues[receiver].append(chat_pb2.ChatMessage(sender=sender, content=content, timestamp=str(time.time())))
 
         return chat_pb2.MessageResponse(success=True, message="Message sent")
     
@@ -65,9 +63,10 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
         def message_stream():
             while True:
                 time.sleep(1)
-        
-        active_users[username] = (active_users[username][0], context)
-        return message_stream()
+                if username in message_queues and message_queues[username]:
+                        # Yield all queued messages
+                        while message_queues[username]:
+                            yield message_queues[username].pop(0)
     
     def GetOnlineUsers(self, request, context):
         return chat_pb2.OnlineUsersResponse(users=list(active_users.keys()))
