@@ -59,14 +59,13 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
         username = request.username
         if username not in active_users:
             context.abort(grpc.StatusCode.UNAUTHENTICATED, "User not logged in")
-        
-        def message_stream():
-            while True:
-                time.sleep(1)
-                if username in message_queues and message_queues[username]:
-                        # Yield all queued messages
-                        while message_queues[username]:
-                            yield message_queues[username].pop(0)
+
+        while True:
+            time.sleep(1)  # Avoid CPU overuse
+            if username in message_queues and message_queues[username]:
+                while message_queues[username]:  # Process all messages in queue
+                    yield message_queues[username].pop(0)
+
     
     def GetOnlineUsers(self, request, context):
         return chat_pb2.OnlineUsersResponse(users=list(active_users.keys()))

@@ -13,6 +13,7 @@ class ChatClient:
 
         #Login user
         self.login(password)
+        threading.Thread(target=self.stream_messages, daemon=True).start()
 
     def login(self, password):
         request = chat_pb2.LoginRequest(username=self.username, password=password)
@@ -86,7 +87,7 @@ class ChatClient:
                 self.send_group_message(group_id[1:], message)
 
             else:
-                print("Invalid command! Use @usernameto send DM, #gpoup to send groupmsg, /users to list online users, /exit to quit.")
+                print("Invalid command! Use @username to send DM, #group to send groupmsg, /users to list online users, /exit to quit.")
 
 if __name__ == "__main__":
     username = input("Enter your username: ")
