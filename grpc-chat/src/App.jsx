@@ -35,7 +35,7 @@ export default function App() {
   const sendMessage = () => {
     if(socket && receiver && message){
       socket.send(JSON.stringify({action: "send_message", receiver, content: message}))
-      setMessage((prev) => [...prev, `You: ${message}`]);
+      setMessages((prev) => [...prev, `You: ${message}`]);
       setMessage("");
     }
   }
