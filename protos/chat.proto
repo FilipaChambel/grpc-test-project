@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package chat;
+
+service ChatService {
+    //User authentication
+    rpc Login(LoginRequest) returns (LoginResponse);
+    rpc Logout(LogoutRequest) returns (LogoutResponse);
+
+    //Send a private message
+    rpc SendPrivateMessage(PrivateMessageRequest) returns (MessaageResponse);
+
+    //Send a group message
+    rpc SendGroupMessage(GroupMessageRequest) returns (MessageResponse);
+
+    //Stream messages in real-time
+    rpc StreamMessages(StreamRequest) returns (stream ChatMessage);
+
+    //Get online users
+    rpc GetOnlineUsers(Empty) returns (OnlineUsersResponse);
+
+    //Update presence status
+    rpc UpdatePresence(PresenceRequest) returns (PresenceResponse);
+}
+
+//Authentication messages
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+} 
+
+message LoginResponse {
+    string token = 1;
+    bool success = 2;
+    string message = 3; 
+}
+
+message LogoutRequest {
+    string token = 1;
+}
+
+message LogoutResponse {
+    bool success = 1;
+}
+
+//Private messages
+message PrivateMessageRequest {
+    string sender = 1;
+    string receiver = 2;
+    string content = 3;
+}
+
+message GroupMessageRequest {
+    string sender = 1;
+    string group_id = 2;
+    string content = 3;
+}
+
+//Response for messages
+message MessageResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+//Streaming messages
+message StreamRequest {
+    string username = 1;
+}
+
+message ChatMessage {
+    string sender = 1;
+    string content = 2;
+    string timestamp = 3;
+}
+
+//Presence and Online users
+message PresenceRequest {
+    string username = 1;
+    bool is_online = 2;
+}
+
+message PresenceResponse {
+    bool success = 1;
+}
+
+message OnlineUsersResponse {
+    repeated string users = 1;
+}
+
+//Empty message
+message Empty {} 
