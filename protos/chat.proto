@@ -8,7 +8,7 @@ service ChatService {
     rpc Logout(LogoutRequest) returns (LogoutResponse);
 
     //Send a private message
-    rpc SendPrivateMessage(PrivateMessageRequest) returns (MessaageResponse);
+    rpc SendPrivateMessage(PrivateMessageRequest) returns (MessageResponse);
 
     //Send a group message
     rpc SendGroupMessage(GroupMessageRequest) returns (MessageResponse);
