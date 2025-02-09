@@ -1,6 +1,5 @@
 import grpc
-from protos import chat_pb2 
-from protos import chat_pb2_grpc 
+from protos import chat_pb2, chat_pb2_grpc 
 from concurrent import futures
 import threading
 import time

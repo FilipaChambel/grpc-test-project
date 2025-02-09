@@ -1,6 +1,5 @@
 import grpc
-import chat_pb2
-import chat_pb2_grpc
+from protos import chat_pb2, chat_pb2_grpc
 import threading
 
 SERVER_ADDRESS = "localhost:50051"
@@ -58,7 +57,7 @@ class ChatClient:
         print("Online users:", ", ".join(response.users))
     
     def update_presence(self, is_online):
-        request = chat_pb2.PResenceRequest(username =self.username, is_online=is_online)
+        request = chat_pb2.PresenceRequest(username =self.username, is_online=is_online)
         self.stub.UpdatePresence(request)
     
     def start_chat(self):
